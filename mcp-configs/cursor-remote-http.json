@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "tools-for-agents": {
+      "type": "streamable-http",
+      "url": "https://api.toolsforagents.tools/mcp",
+      "headers": {
+        "Authorization": "Bearer sk_live_YOUR_KEY"
+      }
+    }
+  }
+}

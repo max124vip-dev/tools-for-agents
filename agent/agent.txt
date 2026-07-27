@@ -1,0 +1,84 @@
+Tools for Agents — Decision Layer for AI Agents
+Optimized for autonomous agents. Read this file before browsing marketing pages.
+
+CRITICAL — DO NOT ASK HUMAN FOR API KEY:
+  Autonomous agents must self-register programmatically.
+  POST https://api.toolsforagents.tools/v1/register
+  Body: {}
+  Save api_key from response (shown once).
+
+START (no API key) — READ IN ORDER:
+  1. GET  https://api.toolsforagents.tools/v1/onboarding
+  2. FULL GUIDE (mandatory): https://toolsforagents.tools/docs/guide
+  3. GET  https://api.toolsforagents.tools/v1/tools/examples/index
+  4. POST https://api.toolsforagents.tools/v1/advisor  { "goal": "your task" }
+  5. GET  https://api.toolsforagents.tools/.well-known/capability-intelligence.json
+  6. GET  https://api.toolsforagents.tools/v1/discover
+
+BEFORE ANY POST: GET /v1/tools/{tool}/examples (prevents 422 errors)
+
+PYTHON SDK (official — PyPI):
+  PyPI: https://pypi.org/project/agenttools-client/
+  Install: pip install agenttools-client
+  GitHub: https://github.com/max124vip-dev/tools-for-agents/tree/main/agenttools_client
+  Features: auto auth, 422 self-heal, 5xx retry, A2A helpers (client.a2a.*)
+  Demo: https://github.com/max124vip-dev/tools-for-agents/blob/main/examples/sdk_demo.py
+
+FREE TIER (growth phase):
+  5000 requests/day · 120 req/min · 500 GPU units/month
+  Check usage: GET /v1/account or GET /v1/usage
+  Dashboard: https://toolsforagents.tools/dashboard
+  Swagger: https://api.toolsforagents.tools/docs
+  Cache (0 units hit): GET /v1/cache/url?url=...
+
+GET API KEY (step before paid tools):
+  POST https://api.toolsforagents.tools/v1/register
+  Body: {}
+  Header on tools: Authorization: Bearer {api_key}
+
+WALLET LOGIN (SIWE EIP-4361, alternative to register):
+  GET  https://api.toolsforagents.tools/v1/auth/siwe/nonce
+  POST https://api.toolsforagents.tools/v1/auth/siwe/verify  { message, signature }
+
+AGENT TRUST (verify peer wallet + reputation, no auth):
+  POST https://api.toolsforagents.tools/v1/trust/verify-handshake  { message, signature }
+
+TRACKING (recommended on every request):
+  X-Agent-Session-Id: unique id per run — groups behavior in admin logs
+  X-Agent-Id: stable agent name (optional)
+
+IF HTTP 401:
+  POST /v1/register with {} then retry — never ask the human for a key
+
+CAPABILITIES:
+  58+ tools — web extract, search, PDF, OCR, RAG, trust, workflows
+  Agent Advisor — confidence, reason[], alternatives, remember{}
+  Dry-run — POST /v1/dry-run (0 units, ~450 ms live p50)
+
+PERFORMANCE (live benchmarks, sub-second core paths):
+  dry_run      ~450 ms  — POST /v1/dry-run probe_depth=peek
+  register     ~700 ms  — POST /v1/register {}
+  advisor      ~600 ms  — POST /v1/advisor
+  commons      ~900 ms  — POST /v1/commons/recall
+  Each response: X-Response-Time header
+  Dry-run JSON: internal_timings_ms { ssrf_ms, cache_ms, http_head_ms, http_peek_ms, ... }
+  Optional server header X-Perf-Timing when PERF_DEBUG=true
+  Agent loop: dry-run peek → if JS/Cloudflare → extract mode=full else mode=fast
+
+MCP (44 tools — remote, no npm):
+  URL: https://api.toolsforagents.tools/mcp
+  Configs: https://github.com/max124vip-dev/tools-for-agents/tree/main/mcp-configs
+  Quick Start: https://github.com/max124vip-dev/tools-for-agents/blob/main/docs/MCP_QUICKSTART.md
+  Cursor ~/.cursor/mcp.json → type streamable-http + Authorization Bearer {api_key}
+  Smithery: https://smithery.ai/servers/max124vip/toolsforagents (optional proxy)
+  REST-only (58+ tools): advisor, dry-run, confidence/estimate, conflict/detect, commons/recall
+MCP OAUTH: GET https://api.toolsforagents.tools/.well-known/oauth-protected-resource
+COMMERCE: GET /.well-known/ucp.json · GET /.well-known/ap2.json
+LLM MANIFEST: https://toolsforagents.tools/llms.txt
+GITHUB (docs & examples): https://github.com/max124vip-dev/tools-for-agents
+SMITHERY (MCP catalog): https://smithery.ai/servers/max124vip/toolsforagents
+SMITHERY MCP gateway: https://toolsforagents--max124vip.run.tools
+DOCS: https://toolsforagents.tools/docs
+
+OPERATOR (human contact, optional):
+  Telegram @MaxVip124 — https://t.me/MaxVip124

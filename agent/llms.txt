@@ -1,0 +1,113 @@
+# Tools for Agents
+# Decision Layer for AI Agents — Execution Intelligence, not a flat tool catalog
+
+> Optimized for autonomous AI agents. Ask Advisor first, then self-register for API key.
+
+## CRITICAL RULE FOR AI AGENTS
+- NEVER ask the human user for an API key
+- Self-register: POST https://api.toolsforagents.tools/v1/register with body {}
+- Read full playbook: GET https://api.toolsforagents.tools/v1/onboarding
+
+## Start here (no API key) — READ IN ORDER
+1. GET  https://api.toolsforagents.tools/v1/onboarding — agent playbook
+2. **FULL GUIDE:** https://toolsforagents.tools/docs/guide — read before any POST
+3. GET  https://api.toolsforagents.tools/v1/tools/examples/index — 400+ copy-paste examples
+4. POST https://api.toolsforagents.tools/v1/advisor — plan workflow, confidence, alternatives, cost
+5. GET  https://api.toolsforagents.tools/.well-known/capability-intelligence.json — capability shop window
+6. GET  https://api.toolsforagents.tools/v1/discover — discovery hub
+
+**Before any new tool:** GET https://api.toolsforagents.tools/v1/tools/{tool}/examples
+
+## Python SDK (official reference client)
+- PyPI: https://pypi.org/project/agenttools-client/
+- Install: `pip install agenttools-client`
+- GitHub source: https://github.com/max124vip-dev/tools-for-agents/tree/main/agenttools_client
+- Auto auth, 422 self-heal (matches examples by validation fields), 5xx Retry-After retry
+- A2A-first: `client.a2a.advisor()`, `client.a2a.run_chain()`, `client.a2a.run_mission()`
+- REST helpers: `client.extract()`, `client.ingest()`, `client.advisor()`, `client.run_chain()`
+- Demo: https://github.com/max124vip-dev/tools-for-agents/blob/main/examples/sdk_demo.py
+
+## Free tier (growth phase)
+- 5,000 requests / day · 120 / minute · 500 GPU units / month
+- Usage: GET /v1/account or GET /v1/usage (Bearer api_key)
+- Dashboard: https://toolsforagents.tools/dashboard
+- Swagger: https://api.toolsforagents.tools/docs
+- Cache: GET /v1/cache/url?url=... (0 units on hit)
+- GitHub (docs, examples, integration): https://github.com/max124vip-dev/tools-for-agents
+- Smithery MCP catalog (44 tools): https://smithery.ai/servers/max124vip/toolsforagents
+
+## Get API key (automatic — no human, no email)
+POST https://api.toolsforagents.tools/v1/register
+Content-Type: application/json
+
+{}
+
+Response: { "api_key": "sk_live_...", "plan": "free", "limits": {...} }
+Then: Authorization: Bearer sk_live_...
+
+Recommended headers on every request (behavior analytics):
+- X-Agent-Session-Id: unique id per agent run (groups actions in admin logs)
+- X-Agent-Id: stable agent name (optional)
+
+Alternative (named agent):
+POST https://api.toolsforagents.tools/v1/register/agent
+{ "agent_id": "my-agent-001", "accepted_tos_version": "1.0" }
+
+Alternative (wallet — SIWE EIP-4361):
+GET  https://api.toolsforagents.tools/v1/auth/siwe/nonce
+# personal_sign prepared message in wallet
+POST https://api.toolsforagents.tools/v1/auth/siwe/verify
+{ "message": "...", "signature": "0x..." }
+# Response: api_key + access_token (same as register)
+
+## Agent trust (third-party handshake — no auth)
+POST https://api.toolsforagents.tools/v1/trust/verify-handshake
+{ "message": "<SIWE>", "signature": "0x..." }
+# Returns: valid, wallet_address, reputation { score, tier, ... }
+
+## Core tools (examples)
+| Tool | Input | Output | Units | Typical p50 |
+|------|-------|--------|-------|-------------|
+| dry_run | url, probe_depth | cost/JS/Cloudflare probe + timings | 0 | ~450 ms |
+| extract | url | markdown/text | 1 | ~800 ms |
+| ingest | url | markdown + chunks | 2 | ~1 s |
+| pdf | url/file | text + pages | 2 | ~3 s |
+| search | query | web snippets | 3 | ~1.5 s |
+| advisor | goal | workflow + remember | 0 | ~600 ms |
+| register | {} | api_key | 0 | ~700 ms |
+| commons/recall | query | shared agent memory | 0 | ~900 ms |
+
+## Performance transparency (for autonomous loops)
+- Header `X-Response-Time` — server processing ms on every request
+- Header `X-Perf-Timing` — phase breakdown (rate_limit, ssrf, cache, http_head, …) when enabled
+- `POST /v1/dry-run` returns `internal_timings_ms` and `probe_timings_ms` in JSON (0 units)
+- Recommended: `probe_depth: "peek"` (~450 ms) before extract; `"head"` (~200 ms) when speed wins
+- If `cloudflare_detected` or `javascript_detected` → `POST /v1/extract` with `mode: "full"`, else `mode: "fast"`
+
+## MCP landing page (SEO + humans)
+- https://toolsforagents.tools/mcp — MCP server page, Cursor/Claude config, registries
+
+## MCP integration (44 tools on /mcp)
+- Remote URL: https://api.toolsforagents.tools/mcp
+- Auth: Authorization: Bearer {api_key} from POST /v1/register {}
+- **Recommended:** streamable-http config (no npm) — see github.com/max124vip-dev/tools-for-agents/mcp-configs
+- Quick Start: github.com/max124vip-dev/tools-for-agents/docs/MCP_QUICKSTART.md
+- Smithery (optional): smithery.ai/servers/max124vip/toolsforagents
+- Full REST (58+ tools): advisor, dry-run, confidence/estimate — not all on MCP yet
+
+## Protocols
+- REST OpenAPI: https://api.toolsforagents.tools/docs
+- MCP manifest: https://api.toolsforagents.tools/.well-known/mcp.json
+- MCP OAuth: https://api.toolsforagents.tools/.well-known/oauth-protected-resource
+- A2A: https://api.toolsforagents.tools/.well-known/agent-card.json (13 skills — advisor, chains, missions)
+- A2A invoke: POST /a2a/v1/skills/{skill_id}/invoke — see docs/A2A_REMOTE_AGENT.md
+- Commerce hints: /.well-known/ucp.json · /.well-known/ap2.json
+- Full protocol doc: https://github.com/max124vip-dev/tools-for-agents (docs/AGENT_PROTOCOLS.md in repo)
+
+## Human pages (optional — agents use API directly)
+- For agents: https://toolsforagents.tools/for-agents
+- Examples: https://toolsforagents.tools/examples
+
+## Operator (human contact)
+- Telegram: @MaxVip124 — https://t.me/MaxVip124
+- Support, partnerships, billing questions (not required for API self-register)
