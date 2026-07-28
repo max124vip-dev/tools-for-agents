@@ -40,8 +40,38 @@ class A2AClient:
             payload["max_latency_ms"] = max_latency_ms
         return await self.invoke("advisor", payload)
 
-    async def run_chain(self, chain_id: str, inputs: dict | None = None) -> dict[str, Any]:
-        return await self.invoke("run-chain", {"chain_id": chain_id, "inputs": inputs or {}})
+    async def run_chain(
+        self,
+        chain_id: str,
+        inputs: dict | None = None,
+        *,
+        crp_provenance: dict | None = None,
+    ) -> dict[str, Any]:
+        payload: dict[str, Any] = {"chain_id": chain_id, "inputs": inputs or {}}
+        if crp_provenance:
+            payload["crp_provenance"] = crp_provenance
+        return await self.invoke("run-chain", payload)
+
+    async def resolve_capability(
+        self,
+        goal: str,
+        *,
+        capability: str | None = None,
+        inputs: dict | None = None,
+        context: dict | None = None,
+        crp_provenance: dict | None = None,
+    ) -> dict[str, Any]:
+        payload: dict[str, Any] = {"goal": goal}
+        if capability:
+            payload["capability"] = capability
+        if inputs:
+            payload["inputs"] = inputs
+        ctx = dict(context or {})
+        if crp_provenance:
+            ctx["crp_provenance"] = crp_provenance
+        if ctx:
+            payload["context"] = ctx
+        return await self.invoke("resolve-capability", payload)
 
     async def run_mission(self, goal: str, *, template: str | None = None, async_job: bool = False) -> dict[str, Any]:
         payload: dict[str, Any] = {"goal": goal}

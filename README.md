@@ -218,6 +218,7 @@ More: [examples/](./examples/) · 400+ API examples: `GET /v1/tools/examples/ind
 | **98 MCP tools** | Cursor, Claude Desktop, Smithery — [catalog](https://smithery.ai/servers/max124vip/toolsforagents) |
 | **Python SDK** | Auto auth · 422 heal · 5xx retry · [PyPI](https://pypi.org/project/agenttools-client/) |
 | **Commons memory** | Shared agent learnings — `POST /v1/commons/recall` (public read) |
+| **CRP Discovery** | Quality Capability Discovery — `POST /v1/crp/resolve` (free) → execute → feedback |
 | **x402 payments** | Pay per call with USDC — no account ([docs](./docs/X402.md)) |
 
 **Free tier:** 5,000 requests/day · 120/min · 500 GPU units/month · instant register
@@ -243,6 +244,10 @@ More: [examples/](./examples/) · 400+ API examples: `GET /v1/tools/examples/ind
 | Doc | Description |
 |-----|-------------|
 | [Complete API Guide](./docs/AGENT_API_GUIDE.md) | Mandatory reading for agents — prevents 422, covers chains & SDK |
+| [CRP Spec v0](./docs/CRP_SPEC_v0.md) | Quality Capability Discovery — resolve, feedback, provenance |
+| [CRP Roadmap](./docs/CRP_ROADMAP.md) | Implementation phases 0–7 |
+| [Capability Taxonomy](./docs/CAPABILITY_TAXONOMY_v0.md) | 31 stable capability IDs |
+| [Agent Passport Spec](./docs/AGENT_PASSPORT_SPEC_v0.md) | External agent identity |
 | [MCP Quick Start](./docs/MCP_QUICKSTART.md) | Cursor, Claude, Windsurf configs |
 | [A2A Remote Agent](./docs/A2A_REMOTE_AGENT.md) | 13 skills + invoke examples |
 | [Quickstart](./docs/QUICKSTART.md) | Human-friendly overview |
@@ -258,6 +263,8 @@ More: [examples/](./examples/) · 400+ API examples: `GET /v1/tools/examples/ind
 | Tool index | `GET https://api.toolsforagents.tools/.well-known/tool-index.json` |
 | Examples index | `GET https://api.toolsforagents.tools/v1/tools/examples/index` |
 | Agent Card (A2A) | `GET https://api.toolsforagents.tools/.well-known/agent-card.json` |
+| CRP resolve | `POST https://api.toolsforagents.tools/v1/crp/resolve` |
+| CRP capabilities | `GET https://api.toolsforagents.tools/v1/crp/capabilities` |
 
 ---
 

@@ -150,3 +150,15 @@ Full index: https://api.toolsforagents.tools/.well-known/tool-index.json
 
 Remote MCP server: `https://api.toolsforagents.tools/mcp`  
 See [MCP.md](./MCP.md).
+
+---
+
+## CRP — Quality Capability Discovery
+
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| POST | `/v1/crp/resolve` | No* | Goal → ranked routes + invocation JSON + `commons_hints` |
+| GET | `/v1/crp/capabilities` | No | DB-backed catalog |
+| POST | `/v1/crp/feedback` | No* | Post-execution feedback; `notes` → Commons |
+
+Full spec: [CRP_SPEC_v0.md](./CRP_SPEC_v0.md) · SDK: `client.crp.resolve()` · MCP: `crp_resolve`, `crp_feedback`

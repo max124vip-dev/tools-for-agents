@@ -9,12 +9,13 @@ from typing import Any
 import httpx
 
 from agenttools_client.a2a import A2AClient
+from agenttools_client.crp import CRPClient
 from agenttools_client._errors import AgentToolsHTTPError, AgentToolsRetryExhausted
 from agenttools_client._heal import is_retryable_status, pick_example_body, retry_after_seconds
 from agenttools_client._paths import infer_tool_from_path
 
 DEFAULT_BASE_URL = "https://api.toolsforagents.tools"
-DEFAULT_USER_AGENT = "AgentToolsClient/0.2.0 (+https://toolsforagents.tools)"
+DEFAULT_USER_AGENT = "AgentToolsClient/0.3.0 (+https://toolsforagents.tools)"
 
 
 class AsyncAgentToolsClient:
@@ -45,6 +46,7 @@ class AsyncAgentToolsClient:
         self.fix_422 = fix_422
         self.user_agent = user_agent
         self._a2a = A2AClient(self)
+        self._crp = CRPClient(self)
         self._client = httpx.AsyncClient(
             base_url=self.base_url,
             timeout=timeout,
@@ -58,6 +60,11 @@ class AsyncAgentToolsClient:
     def a2a(self) -> A2AClient:
         """A2A remote agent — skills, chains, missions (preferred for orchestrators)."""
         return self._a2a
+
+    @property
+    def crp(self) -> CRPClient:
+        """Quality Capability Discovery — resolve, feedback, provenance chaining."""
+        return self._crp
 
     async def __aenter__(self) -> AsyncAgentToolsClient:
         return self
@@ -211,18 +218,28 @@ class AsyncAgentToolsClient:
         include_dry_run: bool = False,
         max_latency_ms: int | None = None,
         use_a2a: bool = False,
+        crp_provenance: dict | None = None,
+        parent_response: dict | None = None,
     ) -> dict[str, Any]:
         if use_a2a:
+            ctx = dict(context or {})
+            prov = crp_provenance or CRPClient.extract_provenance(parent_response or {})
+            if prov:
+                ctx["crp_provenance"] = prov
             return await self.a2a.advisor(
                 goal,
-                context=context,
+                context=ctx or None,
                 inputs=inputs,
                 include_dry_run=include_dry_run,
                 max_latency_ms=max_latency_ms,
             )
         payload: dict[str, Any] = {"goal": goal}
-        if context:
-            payload["context"] = context
+        ctx = dict(context or {})
+        prov = crp_provenance or CRPClient.extract_provenance(parent_response or {})
+        if prov:
+            ctx["crp_provenance"] = prov
+        if ctx:
+            payload["context"] = ctx
         if inputs:
             payload["inputs"] = inputs
         if include_dry_run:
@@ -280,14 +297,31 @@ class AsyncAgentToolsClient:
         inputs: dict | None = None,
         *,
         use_a2a: bool = False,
+        crp_provenance: dict | None = None,
+        parent_response: dict | None = None,
     ) -> dict[str, Any]:
+        prov = crp_provenance or CRPClient.extract_provenance(parent_response or {})
         if use_a2a:
-            return await self.a2a.run_chain(chain_id, inputs)
+            payload: dict[str, Any] = {"chain_id": chain_id, "inputs": inputs or {}}
+            if prov:
+                payload["crp_provenance"] = prov
+            return await self.a2a.invoke("run-chain", payload)
+        body: dict[str, Any] = {"chain_id": chain_id, "inputs": inputs or {}}
+        if prov:
+            body["crp_provenance"] = prov
         return await self.json(
             "POST",
             "/v1/chains/run",
-            json={"chain_id": chain_id, "inputs": inputs or {}},
+            json=body,
         )
+
+    async def upsert_agent_passport(self, body: dict[str, Any]) -> dict[str, Any]:
+        """POST /v1/agents/passport — create or update agent passport (auth required)."""
+        return await self.json("POST", "/v1/agents/passport", json=body)
+
+    async def get_agent_passport(self, agent_id: str) -> dict[str, Any]:
+        """GET /v1/agents/{agent_id}/passport — public safe fields."""
+        return await self.json("GET", f"/v1/agents/{agent_id}/passport", auth=False)
 
     async def invoke_skill(self, skill_id: str, input: dict | None = None) -> dict[str, Any]:
         return await self.json(
@@ -316,6 +350,8 @@ class AgentToolsClient:
         "tool",
         "run_chain",
         "invoke_skill",
+        "upsert_agent_passport",
+        "get_agent_passport",
         "close",
     )
 
@@ -336,10 +372,25 @@ class AgentToolsClient:
     def a2a(self) -> _SyncA2AClient:
         return _SyncA2AClient(self._async.a2a)
 
+    @property
+    def crp(self) -> _SyncCRPClient:
+        return _SyncCRPClient(self._async.crp)
+
     def __getattr__(self, name: str) -> Any:
         if name not in self._DELEGATE:
             raise AttributeError(name)
         return _sync(getattr(self._async, name))
+
+
+class _SyncCRPClient:
+    def __init__(self, inner: CRPClient) -> None:
+        self._inner = inner
+
+    def __getattr__(self, name: str) -> Any:
+        attr = getattr(self._inner, name)
+        if name in ("extract_provenance", "with_provenance", "context_from_provenance"):
+            return attr
+        return _sync(attr)
 
 
 class _SyncA2AClient:

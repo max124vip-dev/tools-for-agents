@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agenttools-client"
-version = "0.2.0"
+version = "0.3.0"
 description = "Self-healing Python client for Tools for Agents — M2M / A2A API"
 readme = "README.md"
 requires-python = ">=3.10"

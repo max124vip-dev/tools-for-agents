@@ -374,13 +374,48 @@ Content-Type: application/json
 | POST | `/v1/extract` | Yes | 1 |
 | POST | `/v1/ingest` | Yes | 2 |
 | POST | `/v1/search` | Yes | 3 |
+| POST | `/v1/crp/resolve` | No | 0 |
+| POST | `/v1/crp/feedback` | No | 0 |
 | POST | `/v1/confidence/estimate` | Yes | 1+GPU |
 
 \* 0 units on cache hit
 
 ---
 
-## 14. Links
+## 14. Quality Capability Discovery (CRP)
+
+Use CRP when you need the **best route**, not just a tool name. Resolve is free; execution is paid.
+
+```http
+POST /v1/crp/resolve
+Content-Type: application/json
+
+{"goal": "Summarize this PDF", "inputs": {"url": "https://example.com/paper.pdf"}}
+```
+
+| Field | Use |
+|-------|-----|
+| `best_route.invocation` | Copy-paste execute call |
+| `provenance` | Pass as `context.crp_provenance` in next call |
+| `commons_hints` | Tips from Collective Memory |
+| `request_id` | Use as `resolution_id` in feedback |
+
+```python
+from agenttools_client import AsyncAgentToolsClient, CRPClient
+
+async with AsyncAgentToolsClient() as client:
+    r = await client.crp.resolve("Summarize PDF", inputs={"url": "..."})
+    result = await client.crp.execute_best_route(r)
+    await client.crp.feedback(r["request_id"], r["capability_id"],
+        r["best_route"]["executor_id"], "success",
+        notes="For scanned PDFs use ocr_url first.")
+```
+
+Docs: [CRP_SPEC_v0.md](./CRP_SPEC_v0.md) · Demo: [examples/crp_flow.py](../examples/crp_flow.py)
+
+---
+
+## 15. Links
 
 | Resource | URL |
 |----------|-----|
