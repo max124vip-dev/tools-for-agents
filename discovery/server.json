@@ -1,0 +1,33 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.max124vip-dev/tools-for-agents",
+  "title": "Tools for Agents",
+  "description": "Decision Layer for AI Agents — 44 MCP tools, 58+ REST tools. 5,000 FREE req/day. Key: POST /v1/register {}.",
+  "version": "0.1.0",
+  "websiteUrl": "https://toolsforagents.tools",
+  "documentationUrl": "https://api.toolsforagents.tools/docs",
+  "repository": {
+    "url": "https://github.com/max124vip-dev/tools-for-agents",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://toolsforagents.tools/assets/logo.svg",
+      "mimeType": "image/svg+xml"
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.toolsforagents.tools/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer API key from POST https://api.toolsforagents.tools/v1/register with body {} (no email). Example: Bearer sk_live_...",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

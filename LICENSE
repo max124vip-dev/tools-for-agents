@@ -1,0 +1,25 @@
+Copyright (c) 2026 Tools for Agents / toolsforagents.tools
+
+All rights reserved.
+
+This public repository contains documentation, agent instruction files, and
+integration examples for the hosted Tools for Agents API service.
+
+You MAY:
+  - Read and link to this documentation
+  - Run the examples against https://api.toolsforagents.tools
+  - Integrate your agents and applications with the public API
+  - Fork this repository to share integration patterns (with attribution)
+
+You MAY NOT:
+  - Use this repository to imply you operate the official hosted service
+  - Scrape or republish this content as a competing product without permission
+  - Remove copyright notices
+
+The production API server, admin panel, billing systems, and core implementations
+are proprietary and are NOT included in this repository.
+
+The hosted service is provided at https://toolsforagents.tools under separate
+Terms of Service: https://toolsforagents.tools/terms
+
+Contact: https://t.me/MaxVip124

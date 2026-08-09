@@ -1,0 +1,15 @@
+{
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "maintainers": ["max124vip-dev"],
+  "name": "Tools for Agents",
+  "description": "Decision Layer for AI Agents — 44+ MCP tools, Agent Advisor, web extract, search, PDF, OCR, embed, crawl, x402. Remote Streamable HTTP.",
+  "category": "aggregators",
+  "homepage": "https://toolsforagents.tools",
+  "documentation": "https://api.toolsforagents.tools/docs",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.toolsforagents.tools/mcp"
+    }
+  ]
+}
